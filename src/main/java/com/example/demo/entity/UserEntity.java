@@ -7,6 +7,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import lombok.Data;
+
+@Data
 @Entity
 @Table(name = "user")
 public class UserEntity {
@@ -16,26 +19,6 @@ public class UserEntity {
     private Long id;
     private String email;
     private String password;
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public Long getId() {
-        return id;
-    }
 
     // getter setters
 }
