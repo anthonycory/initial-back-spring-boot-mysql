@@ -7,6 +7,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
+import org.springframework.util.MultiValueMap;
+
 import lombok.Data;
 
 @Data
@@ -19,6 +21,9 @@ public class UserEntity {
     private Long id;
     private String email;
     private String password;
+
+
+
 
     // getter setters
 }

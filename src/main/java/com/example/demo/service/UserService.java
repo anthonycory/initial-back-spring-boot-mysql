@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 // import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.example.demo.repository.UserRepository;
+import com.example.demo.utils.Bcrypt;
 import com.example.demo.entity.UserEntity;
 
 @Service
@@ -18,21 +20,36 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    // Create user
+    /**
+     * @param email
+     * @param password
+     * @return
+     */
     public ResponseEntity<Object> addUser(String email, String password) {
-        UserEntity user = new UserEntity();
-        user.setEmail("hh");
-        user.setPassword("hh");
-        userRepository.save(user);
-
-        return new ResponseEntity<Object>(user, HttpStatus.ACCEPTED);
+        boolean emailExist = userRepository.findByEmail(email) == null;
+        if(emailExist) {
+            if (password != null && !password.isEmpty() && password.length() >= 8) {
+                UserEntity user = new UserEntity();
+                user.setEmail(email);
+                user.setPassword(Bcrypt.hash(password));
+                userRepository.save(user);
+                return new ResponseEntity<Object>(user, HttpStatus.CREATED);
+            }
+            return new ResponseEntity<Object>("Mot de passe incorrect", HttpStatus.BAD_REQUEST);
+        }
+        return new ResponseEntity<Object>("Email déjà utilisé", HttpStatus.BAD_REQUEST);
     }
 
+    // Get all users
+    /**
+     * @return
+     */
     public List<UserEntity> findAll() {
-
         return userRepository.findAll();
     }
 
-    // GET ONE USER
+    // Get one user
     /**
      * @param id
      * @return
@@ -45,7 +62,7 @@ public class UserService {
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
-    // DELETE USER
+    // Delete user
     /**
      * @param id
      * @return
@@ -62,12 +79,19 @@ public class UserService {
     // Update user
     /**
      * @param id
+     * @param body
      * @return
      */
-    public ResponseEntity<Object> updateUser(Long id) {
-        UserEntity user = userRepository.findById(id).get();
-        user.setEmail("newemjjjjail@@email.fr");
-        userRepository.save(user);
-        return new ResponseEntity<Object>(user, HttpStatus.ACCEPTED);
+    public ResponseEntity<Object> updateUser(Long id, Map<String, String> body) {
+        Optional<UserEntity> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            UserEntity userEntity = user.get();
+            userEntity.setEmail(body.get("email"));
+            userEntity.setPassword(Bcrypt.hash(body.get("password")));
+            userRepository.save(userEntity);
+            return new ResponseEntity<Object>(userEntity, HttpStatus.ACCEPTED);
+        }
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
+
 }
